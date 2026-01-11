@@ -266,21 +266,21 @@ class WorkGeneralKnowledgeGenerator:
             "SoC功耗-热管理"
         )
 
-        self.add_card(
+        self.add_card(",
             "CPU Governor的数据来源是什么？",
-            "CPU Governor需要数据来决定何时以及如何调节CPU频率，不同Governor使用不同的数据来源。\n\n1. 数据来源的分类：\n   - 调度器负载信息：使用Governor schedutil，来源是调度器（如CFS）的负载计算（如PELT的utilization）\n   - CPU利用率采样：使用Governor ondemand、conservative，来源是定期采样CPU利用率（如/proc/stat、CPU idle时间）\n   - 事件驱动：使用Governor interactive，来源是系统事件（如用户输入、中断、唤醒事件）\n   - 固定策略：使用Governor performance、powersave，不需要数据，使用固定策略\n\n2. schedutil的数据来源：\n   - PELT（Per-Entity Load Tracking）利用率：来源是CFS调度器的PELT机制计算的utilization值，实时计算，频率无关\n   - 调度器集成：schedutil直接集成在调度器中，可以直接访问调度器数据，不需要采样，延迟低\n   - 对于非CFS任务：RT任务和Deadline任务通常设置为最高频率",
+            "SoC功耗-调频策略",
             "SoC功耗-调频策略"
         )
 
-        self.add_card(
+        self.add_card(",
             "Android中interactive和schedutil调频策略的对比和配置架构是什么？",
-            "Android系统中，interactive和schedutil是两种主要的CPU调频Governor，各有特点和适用场景。\n\n1. Android中interactive vs schedutil的使用情况：\n   - 历史情况：Android早期（Android 4.0-7.0）主要使用interactive Governor\n   - 现代情况：Android 8.0+部分设备开始使用schedutil，但interactive仍然是主流\n   - 实际使用：大多数Android设备（特别是手机）使用interactive\n\n2. interactive和schedutil的核心对比：\n   - 数据来源：interactive使用事件驱动，schedutil使用调度器负载信息\n   - 响应速度：interactive快速响应交互操作，schedutil基于负载精确调频\n   - 调频精度：interactive基于事件和启发式规则，schedutil基于负载精确计算\n   - 功耗控制：interactive快速提频可能导致功耗较高，schedutil基于负载精确调频，功耗控制更精细\n   - 适用场景：interactive适合移动设备、交互式应用，schedutil适合服务器、负载变化频繁的场景\n\n3. Android调频策略的代码架构：\n   - 内核层：提供调频框架和Governor实现\n   - 用户空间层：配置调频策略\n   - 系统服务层：管理调频策略，根据场景调整\n   - HAL层：提供调频接口，厂商可以定制",
+            "SoC功耗-调频策略",
             "SoC功耗-调频策略"
         )
 
-        self.add_card(
+        self.add_card(",
             "CPU Performance Scaling（CPU性能调节）的系统性介绍是什么？",
-            "CPU Performance Scaling（CPU性能调节）是Linux内核中用于动态调节CPU频率和电压的机制，是DVFS（Dynamic Voltage and Frequency Scaling）的软件实现。\n\n1. 核心概念：\n   - 定义：CPU Performance Scaling是Linux内核提供的动态调节CPU频率和电压的框架\n   - 目的：根据系统负载动态调节CPU性能，平衡性能和功耗\n   - 原理：通过调节CPU频率和电压，在保证性能的前提下最小化功耗\n\n2. 架构组成：\n   - cpufreq子系统：提供统一的频率调节接口和框架\n   - CPU Governor（调频策略）：决定何时以及如何调节频率的策略模块\n   - CPU Driver（CPU驱动）：与硬件交互，实际执行频率调节\n   - 频率表（Frequency Table）：定义CPU支持的频率列表和对应的电压\n\n3. 工作流程：\n   - 步骤1：负载监控 - Governor监控系统负载\n   - 步骤2：频率决策 - Governor根据负载和策略，决定目标频率\n   - 步骤3：频率调节 - CPU Driver接收目标频率，通过PMU调节时钟和电压\n   - 步骤4：验证和反馈 - 验证频率调节是否成功，监控性能和功耗\n\n4. 功耗影响：\n   - 功耗公式：P ∝ f × V²（功耗与频率和电压的平方成正比）\n   - 调频效果：降低频率降低功耗但性能下降，提高频率提高性能但功耗增加\n   - 调压效果：降低电压大幅降低功耗（平方关系），提高电压支持更高频率但功耗大幅增加",
+            "SoC功耗-调频机制",
             "SoC功耗-调频机制"
         )
 
@@ -402,47 +402,47 @@ class WorkGeneralKnowledgeGenerator:
         )
 
     def generate_soc_architecture_cards(self):
-        """生成SoC架构相关的卡片"""
+        ""生成SoC架构相关的卡片""
 
-        self.add_card(
+        self.add_card(",
             "ARM架构的缓存层级有哪些？各有什么特点？",
-            "ARM架构的缓存层级通常包括L1 Cache、L2 Cache和L3 Cache（如果存在），每层缓存有不同的特点和用途。\n\n1. L1 Cache（一级缓存）：\n   - 分为L1 Instruction Cache和L1 Data Cache\n   - 容量：32KB-64KB\n   - 延迟：1-2个时钟周期\n   - 每个CPU核心独享\n   - 原理：L1 Cache是CPU核心的第一级缓存，用于存储最常用的指令和数据，减少对L2 Cache的访问\n   - 比喻：就像工作台旁边的工具盒，最常用，拿取最快\n\n2. L2 Cache（二级缓存）：\n   - 统一缓存（指令和数据共享）\n   - 容量：256KB-1MB\n   - 延迟：5-10个时钟周期\n   - 每个核心独享或共享\n   - 原理：L2 Cache是第二级缓存，用于存储次常用的数据，减少对L3 Cache或主内存的访问\n   - 比喻：就像稍远一点的工具柜，容量更大，但拿取稍慢\n\n3. L3 Cache（三级缓存，System Level Cache）：\n   - 统一缓存，所有核心共享\n   - 容量：1MB-8MB\n   - 延迟：20-40个时钟周期\n   - 用于减少内存访问延迟\n   - 原理：L3 Cache是第三级缓存，用于存储更多数据，减少对主内存的访问，多个核心共享可以提高缓存利用率\n   - 比喻：就像更大的共享仓库，容量最大，但拿取最慢",
+            "SoC架构-缓存",
             "SoC架构-缓存"
         )
 
-        self.add_card(
+        self.add_card(",
             "高通的System Level Cache（SLC）是什么？它如何与GPU共享？",
-            "高通的System Level Cache（SLC，系统级缓存）是位于L2 Cache和DRAM之间的一层共享缓存，是SoC架构中的重要组成部分。\n\n1. SLC的定义和位置：\n   - 定义：SLC是系统级缓存，位于L2 Cache和DRAM之间\n   - 位置：在SoC架构中，SLC位于CPU L2 Cache和主内存（DRAM）之间\n   - 容量：通常几MB到几十MB，比L2 Cache大，比DRAM小\n   - 原理：SLC作为中间层缓存，可以减少对DRAM的访问，提高系统性能\n\n2. SLC的特点：\n   - 共享性：SLC可以被多个处理器（CPU、GPU、DSP等）共享\n   - 容量大：比L2 Cache容量大，可以存储更多数据\n   - 速度较快：比DRAM快，但比L2 Cache慢\n   - 原理：SLC通过共享设计，提高缓存利用率，减少对DRAM的访问\n\n3. SLC与GPU的共享：\n   - 共享机制：SLC可以被CPU和GPU同时访问，实现数据共享\n   - 数据一致性：SLC维护数据一致性，确保CPU和GPU访问的数据一致\n   - 带宽优化：SLC提供高带宽，满足GPU的高带宽需求\n   - 原理：SLC作为共享缓存，可以让CPU和GPU共享数据，减少数据复制，提高效率\n\n4. SLC的优势：\n   - 减少DRAM访问：SLC可以减少对DRAM的访问，降低延迟和功耗\n   - 提高性能：通过共享缓存，提高数据访问效率\n   - 降低功耗：减少DRAM访问可以降低功耗",
+            "SoC架构-缓存",
             "SoC架构-缓存"
         )
 
-        self.add_card(
+        self.add_card(",
             "内存中一次取出的最小大小是多少KB？是否存在各种情况？",
-            "内存中一次取出的最小大小通常不是以KB为单位，而是以字节为单位。最常见的是64字节（0.064KB），但确实存在各种情况，不同架构、不同缓存级别、不同场景下可能有不同的最小单位。\n\n1. 核心概念：\n   - 缓存行（Cache Line）大小：缓存行是CPU从内存读取数据的最小单位，当CPU需要访问内存中的某个字节时，会一次性读取整个缓存行到缓存中\n   - 原理：缓存以行为单位管理数据，一次读取一行可以提高访问效率，利用空间局部性\n   - 比喻：就像从仓库取货时，不是只取一个物品，而是取整个货架（缓存行）\n\n2. 常见的缓存行大小：\n   - 64字节（最常见）：大多数现代CPU架构使用64字节的缓存行，包括Intel x86/x64、AMD x86/x64、ARM Cortex-A系列（大多数），大小：64字节 = 0.064KB（不是整数KB）\n   - 32字节：某些ARM架构使用32字节的缓存行，例如ARM Cortex-M7的L1缓存、ARM Cortex-A7的L1指令缓存，大小：32字节 = 0.032KB\n   - 128字节：某些架构使用128字节的缓存行，例如SPARC64架构的L1数据缓存，大小：128字节 = 0.128KB\n   - 不同缓存级别可能有不同大小：某些架构的L1、L2、L3缓存可能使用不同的缓存行大小\n\n3. 不同架构的缓存行大小：\n   - x86/x64架构：大多数使用64字节的缓存行\n   - ARM架构：大多数使用64字节，但某些使用32字节（如Cortex-A7的L1指令缓存）\n   - 不同场景：CPU缓存访问、DMA访问、向量指令可能有不同的最小单位\n\n4. 总结：\n   - 内存中一次取出的最小大小通常不是整数KB，最常见的是64字节（0.064KB）\n   - 不同架构、不同缓存级别、不同场景可能有不同的最小单位\n   - 缓存行大小是硬件设计的基础参数，通常以字节为单位，是2的幂次方（32、64、128字节）",
+            "SoC架构-缓存",
             "SoC架构-缓存"
         )
 
-        self.add_card(
+        self.add_card(",
             "DMA（直接内存访问）的作用是什么？",
-            "DMA（Direct Memory Access，直接内存访问）是一种允许外设直接访问内存而不需要CPU干预的技术。\n\n1. 减少CPU负担：外设直接访问内存，无需CPU干预\n   - 原理：DMA控制器可以直接访问内存，CPU不需要参与数据传输过程，可以处理其他任务\n   - 比喻：就像外设可以直接从仓库取货，不需要CPU工人帮忙\n\n2. 提高系统效率：支持高速数据传输（如视频编解码、网络数据传输）\n   - 原理：DMA可以高效地传输大量数据，提高系统整体性能\n   - 比喻：就像专门的运输通道，可以快速传输大量货物\n\n3. 降低功耗：减少CPU参与数据传输的功耗开销\n   - 原理：CPU不需要参与数据传输，可以降低功耗\n   - 比喻：就像不需要CPU工人参与，节省能量\n\n4. 提高并发性：CPU可以同时处理其他任务\n   - 原理：DMA传输数据时，CPU可以处理其他任务，提高系统并发性\n   - 比喻：就像CPU工人可以同时做其他工作，不需要等待数据传输完成",
+            "SoC架构-DMA",
             "SoC架构-DMA"
         )
 
-        self.add_card(
+        self.add_card(",
             "DMA操作中的缓存一致性问题如何解决？",
-            "DMA操作可能涉及System Level Cache（L3 Cache），需要确保DMA传输的数据与CPU缓存一致。\n\n1. 问题：DMA操作可能涉及System Level Cache（L3 Cache），需要确保DMA传输的数据与CPU缓存一致\n   - 原理：DMA直接访问内存，但CPU可能缓存了数据，需要保证数据一致性\n   - 比喻：就像DMA从仓库取货，但CPU可能有缓存，需要保证数据一致\n\n2. 解决方案：\n   - Cache Coherency协议：维护缓存一致性\n     * 原理：通过硬件缓存一致性协议（如MESI），自动维护缓存一致性\n     * 比喻：就像自动同步系统，保证数据一致\n   - 写回（Write Back）：将缓存数据写回内存\n     * 原理：在DMA读取前，将CPU缓存中的数据写回内存，确保DMA读取的是最新数据\n     * 比喻：就像在DMA取货前，将CPU缓存的数据写回仓库\n   - 无效化（Invalidate）：使CPU缓存无效，强制从内存读取\n     * 原理：在DMA写入后，使CPU缓存无效，强制CPU从内存读取最新数据\n     * 比喻：就像在DMA写入后，使CPU缓存无效，强制从仓库读取\n   - 刷新（Flush）：将缓存数据刷新到内存\n     * 原理：将CPU缓存中的数据刷新到内存，确保内存中的数据是最新的\n     * 比喻：就像将CPU缓存的数据刷新到仓库，确保仓库数据最新",
+            "SoC架构-DMA",
             "SoC架构-DMA"
         )
 
-        self.add_card(
+        self.add_card(",
             "DMA的优先级设置机制是什么？",
-            "DMA优先级设置机制是DMA控制器用于管理多个DMA请求的优先级，确保重要数据传输优先处理的机制。\n\n1. 核心概念：\n   - 定义：DMA优先级机制用于决定当多个DMA请求同时存在时，哪个请求优先处理\n   - 目的：确保关键数据传输（如实时音频、视频数据）优先处理，避免数据丢失或延迟\n   - 原理：DMA控制器通过优先级机制管理多个DMA请求，高优先级请求优先获得总线访问权\n\n2. 优先级设置方式：\n   - 硬件固定优先级：某些DMA控制器有固定的硬件优先级（如DMA通道0优先级最高）\n   - 软件可配置优先级：通过寄存器配置每个DMA通道的优先级\n   - 基于通道号的优先级：通道号越小，优先级越高（如通道0优先级高于通道1）\n\n3. 优先级级别：\n   - 高优先级：实时性要求高的数据传输（如音频数据、视频数据流）\n   - 中优先级：一般的数据传输（如网络数据包、文件读写）\n   - 低优先级：后台数据传输（如日志写入、统计信息更新）\n\n4. 优先级仲裁机制：\n   - 固定优先级仲裁：高优先级请求总是优先于低优先级请求\n   - 轮询优先级仲裁：相同优先级的请求按轮询方式处理\n   - 加权轮询：根据权重分配总线访问权，权重高的请求获得更多访问机会\n\n5. 实际应用场景：\n   - 音频数据传输：音频数据需要实时传输，延迟会导致音质下降，通常设置为高优先级\n   - 视频数据传输：视频数据流需要连续传输，通常设置为高优先级\n   - 网络数据包：网络数据包通常设置为中优先级\n   - 存储I/O：磁盘读写通常设置为中低优先级",
+            "SoC架构-DMA",
             "SoC架构-DMA"
         )
 
-        self.add_card(
+        self.add_card(",
             "SLC（System Level Cache）和DMA（Direct Memory Access）有什么区别？",
-            "SLC（System Level Cache，系统级缓存）和DMA（Direct Memory Access，直接内存访问）是SoC架构中两个不同的概念，有不同的作用和特点。\n\n1. 定义和本质：\n   - SLC：是系统级缓存，位于L2 Cache和DRAM之间的一层共享缓存，是存储层次结构的一部分\n   - DMA：是一种数据传输机制，允许外设直接访问内存而不需要CPU干预，是数据传输方式\n   - 原理：SLC是存储层次结构的一部分，DMA是数据传输机制，两者本质不同\n   - 比喻：就像SLC是仓库的缓存区，DMA是运输方式\n\n2. 作用：\n   - SLC：用于缓存数据，减少对DRAM的访问，提高访问速度\n   - DMA：用于数据传输，允许外设直接访问内存，减少CPU负担\n   - 原理：SLC是存储优化，DMA是传输优化，两者作用不同\n   - 比喻：就像SLC是优化存储，DMA是优化传输\n\n3. 工作方式：\n   - SLC：自动缓存数据，CPU和GPU等处理器访问数据时，如果数据在SLC中，可以直接从SLC读取\n   - DMA：需要配置DMA控制器，设置源地址、目标地址、传输大小等参数，然后启动传输\n   - 原理：SLC是自动的缓存机制，DMA是主动的传输机制\n   - 比喻：就像SLC是自动缓存，DMA是主动传输\n\n4. 关系：\n   - DMA可能涉及SLC：DMA传输数据时，如果数据在SLC中，可能需要处理缓存一致性问题\n   - SLC可以优化DMA：SLC缓存的数据可以被DMA访问，提高DMA传输效率\n   - 原理：DMA和SLC可以协同工作，但需要处理缓存一致性问题\n   - 比喻：就像DMA和SLC可以协同工作，但需要保证数据一致",
+            "SoC架构-缓存",
             "SoC架构-缓存"
         )
 

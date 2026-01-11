@@ -266,21 +266,21 @@ class WorkGeneralKnowledgeGenerator:
             "SoC功耗-热管理"
         )
 
-        self.add_card(",
+        self.add_card(
             "CPU Governor的数据来源是什么？",
-            "SoC功耗-调频策略",
+            "CPU Governor需要数据来决定何时以及如何调节CPU频率，不同Governor使用不同的数据来源。\n\n1. 数据来源的分类：\n   - 调度器负载信息：\n     * 来源：调度器（如CFS）的负载计算（如PELT的utilization）\n     * 使用Governor：schedutil\n     * 原理：调度器最了解系统负载，提供准确的负载信息\n     * 比喻：就像直接从工作调度系统获取工作量信息\n   - CPU利用率采样：\n     * 来源：定期采样CPU利用率（如/proc/stat、CPU idle时间）\n     * 使用Governor：ondemand、conservative\n     * 原理：通过定期采样CPU利用率，统计负载情况\n     * 比喻：就像定期统计工作量，了解工作强度\n   - 事件驱动：\n     * 来源：系统事件（如用户输入、中断、唤醒事件）\n     * 使用Governor：interactive\n     * 原理：通过监控系统事件，快速响应交互操作\n     * 比喻：就像监控用户操作事件，快速响应\n   - 固定策略：\n     * 来源：不需要数据，使用固定策略\n     * 使用Governor：performance、powersave\n     * 原理：固定频率，不需要负载数据\n     * 比喻：就像固定速度，不需要工作量信息\n\n2. schedutil的数据来源：\n   - PELT（Per-Entity Load Tracking）利用率：\n     * 来源：CFS调度器的PELT机制计算的utilization值\n     * 数据特点：实时计算，频率无关，反映当前和未来负载\n     * 原理：PELT在任务调度时实时更新，提供准确的负载信息\n     * 比喻：就像实时计算工作量，准确反映工作强度\n   - 调度器集成：\n     * schedutil直接集成在调度器中，可以直接访问调度器数据\n     * 不需要采样，延迟低\n     * 原理：集成在调度器中，可以直接访问实时负载信息\n     * 比喻：就像直接在工作调度系统中获取工作量信息，不需要统计\n   - 对于非CFS任务：\n     * RT任务（SCHED_FIFO/SCHED_RR）：通常设置为最高频率\n     * Deadline任务（SCHED_DEADLINE）：通常设置为最高频率\n     * 原理：RT和Deadline任务有严格时间要求，通常需要最高频率\n     * 比喻：就像紧急工作直接使用最高速度，不需要智能调节",
             "SoC功耗-调频策略"
         )
 
-        self.add_card(",
+        self.add_card(
             "Android中interactive和schedutil调频策略的对比和配置架构是什么？",
-            "SoC功耗-调频策略",
+            "Android系统中，interactive和schedutil是两种主要的CPU调频Governor，各有特点和适用场景，Android的调频策略配置架构支持灵活的调频策略选择和配置。\n\n1. Android中interactive vs schedutil的使用情况：\n   - 历史情况：\n     * Android早期（Android 4.0-7.0）：主要使用interactive Governor\n     * 原因：interactive针对移动设备优化，快速响应交互操作，适合Android的交互式应用场景\n     * 原理：Android早期主要使用interactive，因为interactive针对移动设备优化\n     * 比喻：就像Android早期主要使用快速响应模式，适合移动设备\n   - 现代情况：\n     * Android 8.0+：部分设备开始使用schedutil\n     * 但interactive仍然是主流，特别是在移动设备上\n     * 原因：interactive在移动设备上的表现更好，快速响应交互操作，功耗控制更精细\n     * 原理：Android现代版本中，interactive仍然是主流，schedutil在部分设备上使用\n     * 比喻：就像Android现代版本中，快速响应模式仍然是主流，智能模式在部分设备上使用\n   - 实际使用：\n     * 大多数Android设备（特别是手机）使用interactive\n     * 部分设备（特别是平板、服务器）使用schedutil\n     * 厂商可能定制interactive或schedutil，形成自己的调频策略\n     * 原理：实际使用中，interactive在移动设备上更常见，schedutil在部分设备上使用\n     * 比喻：就像大多数移动设备使用快速响应模式，部分设备使用智能模式\n\n2. interactive和schedutil的核心对比：\n   - 数据来源：\n     * interactive：事件驱动（用户输入、系统事件、定时器）\n     * schedutil：调度器负载信息（PELT的utilization）\n     * 原理：interactive使用事件驱动，schedutil使用调度器负载信息\n     * 比喻：就像interactive使用事件触发，schedutil使用工作量信息\n   - 响应速度：\n     * interactive：快速响应交互操作（如触摸），立即提频\n     * schedutil：基于负载精确调频，响应速度取决于负载变化\n     * 原理：interactive针对交互操作优化，schedutil基于负载调频\n     * 比喻：就像interactive快速响应操作，schedutil根据工作量调频\n   - 调频精度：\n     * interactive：基于事件和启发式规则，调频可能不够精确\n     * schedutil：基于负载精确计算，调频更精确\n     * 原理：interactive使用启发式规则，schedutil使用精确计算\n     * 比喻：就像interactive使用经验规则，schedutil使用精确计算\n   - 功耗控制：\n     * interactive：快速提频可能导致功耗较高，但可以通过参数调优控制\n     * schedutil：基于负载精确调频，功耗控制更精细\n     * 原理：interactive可能过度提频，schedutil更精确\n     * 比喻：就像interactive可能过度加速，schedutil更精确\n   - 适用场景：\n     * interactive：移动设备，交互式应用，需要快速响应\n     * schedutil：服务器，负载变化频繁，需要精确调频\n     * 原理：interactive适合移动设备，schedutil适合服务器\n     * 比喻：就像interactive适合快速响应，schedutil适合精确调节",
             "SoC功耗-调频策略"
         )
 
-        self.add_card(",
+        self.add_card(
             "CPU Performance Scaling（CPU性能调节）的系统性介绍是什么？",
-            "SoC功耗-调频机制",
+            "CPU Performance Scaling（CPU性能调节）是Linux内核中用于动态调节CPU频率和电压的机制，是DVFS（Dynamic Voltage and Frequency Scaling）的软件实现。\n\n1. 核心概念：\n   - 定义：CPU Performance Scaling是Linux内核提供的动态调节CPU频率和电压的框架\n   - 目的：根据系统负载动态调节CPU性能，平衡性能和功耗\n   - 原理：通过调节CPU频率和电压，在保证性能的前提下最小化功耗\n   - 比喻：就像根据工作量动态调节工作速度和强度，既保证效率又节省能量\n\n2. 架构组成：\n   - cpufreq子系统：\n     * 位置：Linux内核的cpufreq子系统（drivers/cpufreq/）\n     * 功能：提供统一的频率调节接口和框架\n     * 原理：cpufreq是内核子系统，在内核空间运行，可以直接访问硬件\n     * 比喻：就像统一的频率调节控制中心\n   - CPU Governor（调频策略）：\n     * 功能：决定何时以及如何调节频率的策略模块\n     * 类型：performance、powersave、ondemand、conservative、interactive、schedutil等\n     * 原理：Governor根据系统负载和策略，决定目标频率\n     * 比喻：就像不同的驾驶模式，决定如何调节速度\n   - CPU Driver（CPU驱动）：\n     * 功能：与硬件交互，实际执行频率调节\n     * 类型：针对不同CPU架构的驱动（如ARM的cpufreq-dt、Intel的intel_pstate）\n     * 原理：驱动通过寄存器或接口与PMU（电源管理单元）通信，控制时钟发生器和电压调节器\n     * 比喻：就像实际控制发动机的驱动系统\n   - 频率表（Frequency Table）：\n     * 功能：定义CPU支持的频率列表和对应的电压\n     * 内容：每个频率点对应的电压值（OPP，Operating Performance Point）\n     * 原理：频率和电压需要匹配，频率表定义了有效的频率-电压组合\n     * 比喻：就像速度档位表，定义了有效的速度档位\n\n3. 工作流程：\n   - 步骤1：负载监控\n     * Governor监控系统负载（如CPU利用率、任务队列长度等）\n     * 原理：通过监控负载，判断是否需要调节频率\n     * 比喻：就像监控工作量，判断是否需要调整速度\n   - 步骤2：频率决策\n     * Governor根据负载和策略，决定目标频率\n     * 原理：不同Governor有不同的决策算法\n     * 比喻：就像根据工作量和策略，决定目标速度\n   - 步骤3：频率调节\n     * CPU Driver接收目标频率，通过PMU调节时钟和电压\n     * 原理：驱动与硬件交互，实际执行频率调节\n     * 比喻：就像实际调节发动机速度\n   - 步骤4：验证和反馈\n     * 验证频率调节是否成功，监控性能和功耗\n     * 原理：通过验证和反馈，优化调频策略\n     * 比喻：就像验证速度调节效果，优化策略\n\n4. 功耗影响：\n   - 功耗公式：P ∝ f × V²\n     * f：频率\n     * V：电压\n     * 原理：功耗与频率和电压的平方成正比\n     * 比喻：就像功耗与速度和强度的平方成正比\n   - 调频效果：\n     * 降低频率：降低功耗，但性能下降\n     * 提高频率：提高性能，但功耗增加\n     * 原理：频率和功耗是权衡关系\n     * 比喻：就像速度和能耗是权衡关系\n   - 调压效果：\n     * 降低电压：大幅降低功耗（平方关系）\n     * 提高电压：支持更高频率，但功耗大幅增加\n     * 原理：电压对功耗的影响是平方关系，影响更大\n     * 比喻：就像强度对能耗的影响是平方关系，影响更大",
             "SoC功耗-调频机制"
         )
 

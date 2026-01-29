@@ -33,11 +33,10 @@ class MarkdownToAnkiConverter:
             if line.startswith('#'):
                 self._update_section_path(line)
             
-            # 检查是否是卡片标题
-            card_match = re.match(r'^####\s+卡片\s+(\d+)', line)
-            if card_match:
-                card_num = int(card_match.group(1))
-                card = self._extract_card(lines, i, card_num)
+            # 检查是否是问题行（卡片开始）
+            # 支持 **问题**： 和 **问题**: 两种格式
+            if line.startswith('**问题**：') or line.startswith('**问题**:'):
+                card = self._extract_card(lines, i)
                 if card:
                     cards.append(card)
                     # 跳过已处理的行
@@ -63,20 +62,19 @@ class MarkdownToAnkiConverter:
             else:
                 self.current_section_path = [title]
     
-    def _extract_card(self, lines: List[str], start_idx: int, card_num: int) -> Optional[Dict]:
+    def _extract_card(self, lines: List[str], start_idx: int) -> Optional[Dict]:
         """提取单个卡片的内容"""
-        i = start_idx + 1  # 跳过卡片标题行
+        i = start_idx
         question = None
         answer_lines = []
         
-        # 查找问题
-        while i < len(lines):
-            line = lines[i].strip()
-            if line.startswith('**问题**：') or line.startswith('**问题**:'):
-                question = line.replace('**问题**：', '').replace('**问题**:', '').strip()
-                i += 1
-                break
+        # 提取问题（当前行就是问题行）
+        line = lines[i].strip()
+        if line.startswith('**问题**：') or line.startswith('**问题**:'):
+            question = line.replace('**问题**：', '').replace('**问题**:', '').strip()
             i += 1
+        else:
+            return None
         
         if not question:
             return None
@@ -85,13 +83,19 @@ class MarkdownToAnkiConverter:
         answer_started = False
         while i < len(lines):
             line = lines[i]
+            line_stripped = line.strip()
             
-            # 检查是否是下一个卡片或分隔符
-            if line.strip().startswith('#### 卡片') or line.strip() == '---':
+            # 检查是否是下一个卡片开始（遇到下一个问题行）
+            if line_stripped.startswith('**问题**：') or line_stripped.startswith('**问题**:'):
+                break
+            
+            # 检查是否是分隔符（卡片结束）
+            if line_stripped == '---':
+                i += 1  # 包含分隔符行
                 break
             
             # 检查是否是答案开始
-            if line.strip().startswith('**答案**：') or line.strip().startswith('**答案**:'):
+            if line_stripped.startswith('**答案**：') or line_stripped.startswith('**答案**:'):
                 answer_started = True
                 i += 1
                 continue
@@ -111,7 +115,6 @@ class MarkdownToAnkiConverter:
         tag = self._generate_tag()
         
         return {
-            'card_num': card_num,
             'question': question,
             'answer': answer,
             'tag': tag,

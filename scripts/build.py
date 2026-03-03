@@ -42,7 +42,9 @@ def build_all():
     
     md_files = {
         'work': 'work_general_knowledge.md',
-        'leetcode': 'leetcode_hot100.md'
+        'leetcode': 'leetcode_hot100.md',
+        'llm': 'llm_knowledge.md',
+        'robotics': 'robotics_knowledge.md'
     }
     
     converter = MarkdownToAnkiConverter()

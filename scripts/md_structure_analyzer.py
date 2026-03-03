@@ -57,6 +57,7 @@ class MarkdownStructureAnalyzer:
         self.section_stack = []
         
         i = 0
+        card_counter = 0  # 用于给卡片编号
         while i < len(lines):
             line = lines[i].strip()
             
@@ -65,10 +66,23 @@ class MarkdownStructureAnalyzer:
                 level = len(line) - len(line.lstrip('#'))
                 title = line.lstrip('#').strip()
                 
-                # 处理标题
-                self._process_heading(title, level, i + 1)
+                # 检查是否是问题标题格式（#### 问题： 或 ##### 问题：）
+                # 这种格式应该作为卡片处理，而不是普通标题
+                if re.match(r'^#{4,6}\s+问题[：:].*', line):
+                    card_counter += 1
+                    card_end = self._find_card_end(lines, i)
+                    self._add_card(card_counter, i + 1, card_end)
+                else:
+                    # 处理普通标题
+                    self._process_heading(title, level, i + 1)
             
-            # 检查是否是卡片标题
+            # 检查是否是粗体格式的问题（兼容旧格式）
+            elif line.startswith('**问题**：') or line.startswith('**问题**:'):
+                card_counter += 1
+                card_end = self._find_card_end(lines, i)
+                self._add_card(card_counter, i + 1, card_end)
+            
+            # 检查是否是旧格式的卡片标题（#### 卡片 N）
             elif re.match(r'^####\s+卡片\s+\d+', line):
                 card_num_match = re.match(r'^####\s+卡片\s+(\d+)', line)
                 if card_num_match:
@@ -119,7 +133,12 @@ class MarkdownStructureAnalyzer:
             line = lines[i].strip()
             
             # 检查是否是下一个卡片或分隔符
-            if line.startswith('#### 卡片') or line == '---':
+            # 支持多种格式：#### 卡片 N、#### 问题：、**问题**：
+            if (line.startswith('#### 卡片') or 
+                re.match(r'^#{4,6}\s+问题[：:].*', line) or
+                line.startswith('**问题**：') or 
+                line.startswith('**问题**:') or
+                line == '---'):
                 return i
             
             i += 1

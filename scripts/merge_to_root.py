@@ -13,10 +13,19 @@ from typing import List
 
 
 def count_cards(content: str) -> int:
-    """统计卡片数量（通过 **问题**： 或 **问题**: 的出现次数）"""
-    pattern = r'\*\*问题\*\*[：:]'
-    matches = re.findall(pattern, content)
-    return len(matches)
+    """统计卡片数量（支持 **问题**： 和 #### 问题： 两种格式）"""
+    # 匹配 #### 问题： 或 ##### 问题： 格式（行首）
+    heading_pattern = r'^#{4,6}\s+问题[：:].*$'
+    # 匹配 **问题**： 格式（兼容旧格式）
+    bold_pattern = r'^\*\*问题\*\*[：:].*$'
+    
+    lines = content.split('\n')
+    count = 0
+    for line in lines:
+        if re.match(heading_pattern, line) or re.match(bold_pattern, line):
+            count += 1
+    
+    return count
 
 
 def merge_domain(domain: str, content_dir: Path, output_dir: Path) -> bool:
@@ -75,7 +84,9 @@ def merge_domain(domain: str, content_dir: Path, output_dir: Path) -> bool:
     # 确定输出文件名
     output_filename_map = {
         'work': 'work_general_knowledge.md',
-        'leetcode': 'leetcode_hot100.md'
+        'leetcode': 'leetcode_hot100.md',
+        'llm': 'llm_knowledge.md',
+        'robotics': 'robotics_knowledge.md'
     }
     
     output_filename = output_filename_map.get(domain)
@@ -98,7 +109,7 @@ def main():
     project_root = Path(__file__).parent.parent
     content_dir = project_root / 'content'
     
-    domains = ['work', 'leetcode']
+    domains = ['work', 'leetcode', 'llm', 'robotics']
     
     print("=" * 80)
     print("开始合并 content/ 到根目录 MD 文件")

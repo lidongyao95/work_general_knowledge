@@ -31,11 +31,21 @@ class MarkdownToAnkiConverter:
             
             # 检查是否是标题行
             if line.startswith('#'):
-                self._update_section_path(line)
+                # 检查是否是问题标题格式（#### 问题： 或 ##### 问题：）
+                if re.match(r'^#{4,6}\s+问题[：:].*', line):
+                    card = self._extract_card(lines, i)
+                    if card:
+                        cards.append(card)
+                        # 跳过已处理的行
+                        i = card['end_line']
+                        continue
+                else:
+                    # 普通标题，更新章节路径
+                    self._update_section_path(line)
             
-            # 检查是否是问题行（卡片开始）
+            # 检查是否是问题行（卡片开始）- 兼容旧格式
             # 支持 **问题**： 和 **问题**: 两种格式
-            if line.startswith('**问题**：') or line.startswith('**问题**:'):
+            elif line.startswith('**问题**：') or line.startswith('**问题**:'):
                 card = self._extract_card(lines, i)
                 if card:
                     cards.append(card)
@@ -70,7 +80,14 @@ class MarkdownToAnkiConverter:
         
         # 提取问题（当前行就是问题行）
         line = lines[i].strip()
-        if line.startswith('**问题**：') or line.startswith('**问题**:'):
+        
+        # 检查是否是标题格式的问题（#### 问题： 或 ##### 问题：）
+        heading_match = re.match(r'^#{4,6}\s+问题[：:]\s*(.*)$', line)
+        if heading_match:
+            question = heading_match.group(1).strip()
+            i += 1
+        # 检查是否是粗体格式的问题（兼容旧格式）
+        elif line.startswith('**问题**：') or line.startswith('**问题**:'):
             question = line.replace('**问题**：', '').replace('**问题**:', '').strip()
             i += 1
         else:
@@ -86,7 +103,10 @@ class MarkdownToAnkiConverter:
             line_stripped = line.strip()
             
             # 检查是否是下一个卡片开始（遇到下一个问题行）
-            if line_stripped.startswith('**问题**：') or line_stripped.startswith('**问题**:'):
+            # 支持标题格式和粗体格式
+            if (re.match(r'^#{4,6}\s+问题[：:].*', line_stripped) or 
+                line_stripped.startswith('**问题**：') or 
+                line_stripped.startswith('**问题**:')):
                 break
             
             # 检查是否是分隔符（卡片结束）

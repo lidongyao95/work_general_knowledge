@@ -3,7 +3,7 @@
 ### Gauge/库仑计
 
 
-**问题**：Gauge和库仑计的关系是什么？
+#### 问题：Gauge和库仑计的关系是什么？
 
 **答案**：
 
@@ -18,7 +18,7 @@
 ### PMIC/FuelGauge
 
 
-**问题**：PMIC和Fuel Gauge在实际应用中的协作关系是什么？
+#### 问题：PMIC和Fuel Gauge在实际应用中的协作关系是什么？
 
 **答案**：
 
@@ -39,7 +39,7 @@ PMIC和Fuel Gauge不是竞争关系，而是"协同工作"的关系：
 ### PMU/PMIC
 
 
-**问题**：PMU和PMIC的区别是什么？
+#### 问题：PMU和PMIC的区别是什么？
 
 **答案**：
 
@@ -56,7 +56,7 @@ PMIC（Power Management IC，电源管理芯片）：
 ### uevent
 
 
-**问题**：Power Supply子系统中的uevent机制是什么？Power Supply发送uevent，是不是userspace有监听才能收到，或者说注册回调？给出完整过程。
+#### 问题：Power Supply子系统中的uevent机制是什么？Power Supply发送uevent，是不是userspace有监听才能收到，或者说注册回调？给出完整过程。
 
 **答案**：
 
@@ -256,7 +256,7 @@ PMIC（Power Management IC，电源管理芯片）：
 ### 充电状态
 
 
-**问题**：Power Supply子系统中的充电状态有哪些？
+#### 问题：Power Supply子系统中的充电状态有哪些？
 
 **答案**：
 
@@ -278,7 +278,7 @@ PMIC（Power Management IC，电源管理芯片）：
 ### 功耗监控
 
 
-**问题**：如何通过Power Supply子系统监控功耗？
+#### 问题：如何通过Power Supply子系统监控功耗？
 
 **答案**：
 
@@ -305,7 +305,7 @@ PMIC（Power Management IC，电源管理芯片）：
 ### 基础
 
 
-**问题**：什么是Power Supply子系统？
+#### 问题：什么是Power Supply子系统？
 
 **答案**：
 
@@ -323,7 +323,7 @@ Power Supply子系统是Linux内核中用于管理电源供应的框架。
 ### 属性
 
 
-**问题**：Power Supply子系统中的属性有哪些？
+#### 问题：Power Supply子系统中的属性有哪些？
 
 **答案**：
 
@@ -348,7 +348,7 @@ Power Supply子系统通过sysfs暴露属性，常见属性包括：
 ### 数据获取
 
 
-**问题**：如何通过Power Supply子系统获取电池信息？
+#### 问题：如何通过Power Supply子系统获取电池信息？
 
 **答案**：
 
@@ -372,7 +372,7 @@ Power Supply子系统通过sysfs暴露属性，常见属性包括：
 ### 电池消耗
 
 
-**问题**：如何获取电池消耗量？三种方式有什么区别？
+#### 问题：如何获取电池消耗量？三种方式有什么区别？
 
 **答案**：
 
@@ -388,7 +388,7 @@ Power Supply子系统通过sysfs暴露属性，常见属性包括：
 ### 通信模块
 
 
-**问题**：Modem、WiFi、蓝牙、基带的关系是什么？
+#### 问题：Modem、WiFi、蓝牙、基带的关系是什么？
 
 **答案**：
 
@@ -412,7 +412,7 @@ WiFi和蓝牙：
 ### 驱动实现
 
 
-**问题**：Power Supply驱动如何实现？
+#### 问题：Power Supply驱动如何实现？
 
 **答案**：
 
